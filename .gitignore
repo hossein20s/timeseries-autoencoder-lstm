@@ -49,3 +49,4 @@ __pycache__/
 *$py.class
 
 # End of https://www.gitignore.io/api/macos,jupyternotebook
+/.idea/

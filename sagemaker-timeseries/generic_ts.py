@@ -156,7 +156,7 @@ class BaseRNNClassifier(mx.gluon.Block):
         iter_type = 'numpy'
         train_iter = None
         test_iter = None
-        #print "Data type:", type(train_data), type(test_data), iter_type, type(train_data[0])
+        #print("Data type:", type(train_data), type(test_data), iter_type, type(train_data[0]))
         
         # Can take MX NDArrayIter, or DataLoader
         if isinstance(train_data, mx.io.NDArrayIter):
@@ -183,11 +183,11 @@ class BaseRNNClassifier(mx.gluon.Block):
         else:
             raise ValueError("pass mxnet ndarray or numpy array as [data, label]")
 
-        #print "Data type:", type(train_data), type(test_data), iter_type
-        #print "Sizes", self.n_layer, batch_size, self.rnn_size, self.ctx
+        #print("Data type:", type(train_data), type(test_data), iter_type
+        #print("Sizes", self.n_layer, batch_size, self.rnn_size, self.ctx
         
         for e in range(epochs):
-            #print self.lstm.collect_params()
+            #print(self.lstm.collect_params()
 
             # reset iterators if of MXNet Itertype
             if iter_type == "mxiter":
@@ -200,12 +200,12 @@ class BaseRNNClassifier(mx.gluon.Block):
             yhat = []
             for i, batch in enumerate(train_iter):
                 data, label = BaseRNNClassifier.get_data(batch, iter_type, self.ctx)
-                #print "Data Shapes:", data.shape, label.shape
+                #print("Data Shapes:", data.shape, label.shape
                 hidden = detach(hidden)
                 #with mx.gluon.autograd.record(train_mode=True):
                 with autograd.record():
                     preds, hidden = self.forward(data, hidden)
-                    #print preds[0].shape, hidden[0].shape, label.shape
+                    #print(preds[0].shape, hidden[0].shape, label.shape
                     loss = self.loss(preds, label) 
                     yhat.extend(preds)
                 loss.backward()                                        
@@ -272,7 +272,7 @@ def train(channel_input_dirs, hyperparameters, **kwargs):
     if num_gpus >1:
         ctx = [mx.gpu(i) for i in range(num_gpus)]
     
-    print (ctx)
+    print((ctx))
     model = BaseRNNClassifier(ctx)
     model.build_model(n_out=n_out, rnn_size=rnn_size, n_layer=n_layer)
     model.compile_model()
@@ -280,7 +280,7 @@ def train(channel_input_dirs, hyperparameters, **kwargs):
     return model
 
 def save(net, model_dir):
-    print ("saving the model")
+    print(("saving the model"))
     net.save(model_dir)
     
     # save the model

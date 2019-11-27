@@ -40,7 +40,7 @@ def _print_download_progress(count, block_size, total_size):
     # Status-message. Note the \r which means the line should overwrite itself.
     msg = "\r- Download progress: {0:.1%}".format(pct_complete)
 
-    # Print it.
+    # print(it.
     sys.stdout.write(msg)
     sys.stdout.flush()
 

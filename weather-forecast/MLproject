@@ -1,0 +1,10 @@
+name: forecast
+
+# conda_env: conda.yaml
+docker-env:
+    image: vitachain/forecast
+
+entry_points:
+  main:
+    command: "python forecast.py"
+

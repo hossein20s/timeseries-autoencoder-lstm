@@ -22,7 +22,10 @@ if __name__ == '__main__':
     print(X_test.shape)
     print(y_test.shape)
 
-    pred = model.predict([X_test], is_label_included=False)
+    pred = model.predict([X_test], batch_size=421, is_label_included=False)
 
     print(pred.shape)
-    print(pred[y_test[3:2947] - pred].shape)
+    indices = [y_test.astype(int) != pred]
+    print(pred[indices])
+    print(y_test[indices])
+    print(y_test[indices].shape)

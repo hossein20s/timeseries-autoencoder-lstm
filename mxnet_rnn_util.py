@@ -208,6 +208,7 @@ class BaseRNNClassifier(mx.gluon.Block):
             output, hidden = self.forward(data, hidden)
             batch_pred_list.append(output.asnumpy())
         # return np.vstack(batch_pred_list)
+        print(len(batch_pred_list))
         return np.argmax(np.vstack(batch_pred_list), 1)
 
 

@@ -18,23 +18,23 @@ class BaseRNNClassifier(mx.gluon.Block):
     '''
 
     @classmethod
-    def get_data(cls, batch, iter_type, ctx):
+    def get_data(cls, batch, is_mx_iter_type, ctx, is_label_included=True):
         ''' get data and label from the iterator/dataloader '''
-        if iter_type == 'mxiter':
+        if is_mx_iter_type:
             X = batch.data[0].as_in_context(ctx)
-            y = batch.label[0].as_in_context(ctx)
-        elif iter_type in ["numpy", "dataloader"]:
+            y = batch.label[0].as_in_context(ctx) if is_label_included else None
+        else: # lif iter_type in ["numpy", "dataloader"]:
             X = batch[0].as_in_context(ctx)
-            y = batch[1].as_in_context(ctx)
-        else:
-            raise ValueError("iter_type must be mxiter or numpy")
+            y = batch[1].as_in_context(ctx) if is_label_included else None
+        #else:
+        #    raise ValueError("iter_type must be mxiter or numpy")
         return X, y
 
     @classmethod
-    def get_all_labels(cls, data_iterator, iter_type):
-        if iter_type == 'mxiter':
+    def get_all_labels(cls, data_iterator, is_mx_iter_type):
+        if is_mx_iter_type:
             pass
-        elif iter_type in ["numpy", "dataloader"]:
+        else:
             return data_iterator._dataset._label
 
     def __init__(self, ctx):
@@ -65,13 +65,13 @@ class BaseRNNClassifier(mx.gluon.Block):
         self.optimizer = mx.gluon.Trainer(self.collect_params(), 'adam',
                                           {'learning_rate': self.lr})
 
-    def top_k_acc(self, data_iterator, iter_type='mxiter', top_k=3, batch_size=128):
+    def top_k_acc(self, data_iterator, is_mx_iter_type=True, top_k=3, batch_size=128):
         batch_pred_list = []
         true_labels = []
         init_state = mx.nd.zeros((self.n_layer, batch_size, self.rnn_size), self.ctx)
         hidden = [init_state] * 2
         for i, batch in enumerate(data_iterator):
-            data, label = BaseRNNClassifier.get_data(batch, iter_type, self.ctx)
+            data, label = BaseRNNClassifier.get_data(batch, is_mx_iter_type, self.ctx)
             batch_pred = self.forward(data, hidden)
             # batch_pred = mx.nd.argmax(batch_pred, axis=1)
             batch_pred_list.append(batch_pred.asnumpy())
@@ -81,12 +81,12 @@ class BaseRNNClassifier(mx.gluon.Block):
         argsorted_y = np.argsort(y)[:, -top_k:]
         return np.asarray(np.any(argsorted_y.T == true_labels, axis=0).mean(dtype='f'))
 
-    def evaluate_accuracy(self, data_iterator, metric='acc', iter_type='mxiter', batch_size=128):
+    def evaluate_accuracy(self, data_iterator, metric='acc', is_mx_iter_type=True, batch_size=128):
         met = mx.metric.Accuracy()
         init_state = mx.nd.zeros((self.n_layer, batch_size, self.rnn_size), self.ctx)
         hidden = [init_state] * 2
         for i, batch in enumerate(data_iterator):
-            data, label = BaseRNNClassifier.get_data(batch, iter_type, self.ctx)
+            data, label = BaseRNNClassifier.get_data(batch, is_mx_iter_type, self.ctx)
             # Lets do a forward pass only!
             output, hidden = self.forward(data, hidden)
             preds = mx.nd.argmax(output, axis=1)
@@ -99,16 +99,6 @@ class BaseRNNClassifier(mx.gluon.Block):
 
         return met.get()
 
-    def predict(self, data_iterator, iter_type='mxiter', batch_size=128):
-        batch_pred_list = []
-        init_state = mx.nd.zeros((self.n_layer, batch_size, self.rnn_size), self.ctx)
-        hidden = [init_state] * 2
-        for i, batch in enumerate(data_iterator):
-            data, label = BaseRNNClassifier.get_data(batch, iter_type, self.ctx)
-            output, hidden = self.forward(data, hidden)
-            batch_pred_list.append(output.asnumpy())
-        # return np.vstack(batch_pred_list)
-        return np.argmax(np.vstack(batch_pred_list), 1)
 
     def fit(self, train_data, test_data, epochs, batch_size, verbose=True):
         '''
@@ -116,51 +106,24 @@ class BaseRNNClassifier(mx.gluon.Block):
         '''
 
         moving_loss = 0.
-        total_batches = 0
 
         train_loss = []
         train_acc = []
         test_acc = []
 
-        iter_type = 'numpy'
-        train_iter = None
-        test_iter = None
-        print("Data type:", type(train_data), type(test_data), iter_type, type(train_data[0]))
+        print("Data type:", type(train_data), type(test_data), type(train_data[0]))
 
-        # Can take MX NDArrayIter, or DataLoader
-        if isinstance(train_data, mx.io.NDArrayIter):
-            train_iter = train_data
-            test_iter = test_data
-            iter_type = 'mxiter'
-            # total_batches = train_iter.num_data // train_iter.batch_size
+        train_iter, total_batches, is_mx_iter_type = BaseRNNClassifier.to_nd_array_iter(train_data, batch_size)
+        test_iter, _, _ = BaseRNNClassifier.to_nd_array_iter(test_data, batch_size)
 
-        elif isinstance(train_data, list):
-            if isinstance(train_data[0], np.ndarray) and isinstance(train_data[1], np.ndarray):
-                X, y = np.asarray(train_data[0]).astype('float32'), np.asarray(train_data[1]).astype('float32')
-                tX, ty = np.asarray(test_data[0]).astype('float32'), np.asarray(test_data[1]).astype('float32')
-
-                total_batches = X.shape[0] // batch_size
-                train_iter = mx.gluon.data.DataLoader(mx.gluon.data.ArrayDataset(X, y),
-                                                      batch_size=batch_size, shuffle=True, last_batch='discard')
-                test_iter = mx.gluon.data.DataLoader(mx.gluon.data.ArrayDataset(tX, ty),
-                                                     batch_size=batch_size, shuffle=False, last_batch='discard')
-
-        elif isinstance(train_data, mx.gluon.data.dataloader.DataLoader) and isinstance(test_data,
-                                                                                        mx.gluon.data.dataloader.DataLoader):
-            train_iter = train_data
-            test_iter = test_data
-            total_batches = len(train_iter)
-        else:
-            raise ValueError("pass mxnet ndarray or numpy array as [data, label]")
-
-        print("Data type:", type(train_data), type(test_data), iter_type)
+        print("Data type:", type(train_data), type(test_data), is_mx_iter_type)
         print("Sizes", self.n_layer, batch_size, self.rnn_size, self.ctx)
 
         for e in range(epochs):
             # print self.lstm.collect_params()
 
             # reset iterators if of MXNet Itertype
-            if iter_type == "mxiter":
+            if is_mx_iter_type:
                 train_iter.reset()
                 test_iter.reset()
 
@@ -169,7 +132,7 @@ class BaseRNNClassifier(mx.gluon.Block):
             # hidden = self.begin_state(func=mx.nd.zeros, batch_size=batch_size, ctx=self.ctx)
             yhat = []
             for i, batch in enumerate(train_iter):
-                data, label = BaseRNNClassifier.get_data(batch, iter_type, self.ctx)
+                data, label = BaseRNNClassifier.get_data(batch, is_mx_iter_type, self.ctx)
                 # print "Data Shapes:", data.shape, label.shape
                 hidden = detach(hidden)
                 with mx.autograd.record(train_mode=True):
@@ -194,21 +157,48 @@ class BaseRNNClassifier(mx.gluon.Block):
 
             train_loss.append(moving_loss)
 
-            t_acc = self.evaluate_accuracy(train_iter, iter_type=iter_type, batch_size=batch_size)
+            t_acc = self.evaluate_accuracy(data_iterator=train_iter, is_mx_iter_type=is_mx_iter_type, batch_size=batch_size)
             train_acc.append(t_acc[1])
 
-            tst_acc = self.evaluate_accuracy(test_iter, iter_type=iter_type, batch_size=batch_size)
+            tst_acc = self.evaluate_accuracy(data_iterator=test_iter, is_mx_iter_type=is_mx_iter_type, batch_size=batch_size)
             test_acc.append(tst_acc[1])
 
             print("Epoch %s. Loss: %.5f Train Acc: %s Test Acc: %s" % (e, moving_loss, t_acc, tst_acc))
         return train_loss, train_acc, test_acc
 
-    def predict(self, data_iterator, iter_type='mxiter', batch_size=128):
+    @staticmethod
+    def to_nd_array_iter(data, batch_size=None):
+        data_iter = None
+        total_batches = None
+        is_mx_iter_type = False
+        # Can take MX NDArrayIter, or DataLoader
+        if isinstance(data, mx.io.NDArrayIter):
+            data_iter = data
+            is_mx_iter_type = True
+            # total_batches = train_iter.num_data // train_iter.batch_size
+
+        elif isinstance(data, list):
+            if isinstance(data[0], np.ndarray) and isinstance(data[1], np.ndarray):
+                tX, ty = np.asarray(data[0]).astype('float32'), np.asarray(data[1]).astype('float32')
+
+                total_batches = tX.shape[0] // batch_size
+                data_iter = mx.gluon.data.DataLoader(mx.gluon.data.ArrayDataset(tX, ty),
+                                                     batch_size=batch_size, shuffle=False, last_batch='discard')
+
+        elif isinstance(data, mx.gluon.data.dataloader.DataLoader):
+            data_iter = data
+            total_batches = len(data_iter)
+        else:
+            raise ValueError("pass mxnet ndarray or numpy array as [data, label]")
+        return data_iter, total_batches, is_mx_iter_type
+
+    def predict(self, data_iterator, is_mx_iter_type=True, batch_size=128, is_label_included=True):
         batch_pred_list = []
         init_state = mx.nd.zeros((self.n_layer, batch_size, self.rnn_size), self.ctx)
         hidden = [init_state] * 2
         for i, batch in enumerate(data_iterator):
-            data, label = BaseRNNClassifier.get_data(batch, iter_type, self.ctx)
+            data, _ = BaseRNNClassifier.get_data(batch, is_mx_iter_type, self.ctx, is_label_included)
             output, hidden = self.forward(data, hidden)
             batch_pred_list.append(output.asnumpy())
+        # return np.vstack(batch_pred_list)
         return np.argmax(np.vstack(batch_pred_list), 1)

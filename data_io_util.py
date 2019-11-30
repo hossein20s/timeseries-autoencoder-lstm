@@ -1,4 +1,3 @@
-
 import numpy as np
 
 INPUT_SIGNAL_TYPES = [
@@ -22,10 +21,11 @@ LABELS = [
     "LAYING"
 ]
 
+
 def load_data(files):
     arr = []
-    for fname in files:
-        with open(fname, 'r') as f:
+    for file_name in files:
+        with open(file_name, 'r') as f:
             rows = [row.replace('  ', ' ').strip().split(' ') for row in f]
             arr.append([np.array(ele, dtype=np.float32) for ele in rows])
     return np.transpose(np.array(arr), (1, 2, 0))

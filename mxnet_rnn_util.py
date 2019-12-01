@@ -47,8 +47,8 @@ class BaseRNNClassifier(mx.gluon.Block):
         self.n_out = n_out
 
         # LSTM default; #TODO(Sunil): make this generic
-        self.lstm = mx.gluon.rnn.LSTM(self.rnn_size, self.n_layer, layout='NTC')
-        # self.lstm = mx.gluon.rnn.GRU(self.rnn_size, self.n_layer)
+        # self.lstm = mx.gluon.rnn.LSTM(self.rnn_size, self.n_layer, layout='NTC')
+        self.lstm = mx.gluon.rnn.GRU(self.rnn_size, self.n_layer)
         self.output = mx.gluon.nn.Dense(self.n_out)
 
     def forward(self, x, hidden):

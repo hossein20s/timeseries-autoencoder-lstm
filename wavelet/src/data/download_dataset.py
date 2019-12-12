@@ -15,5 +15,5 @@ if exists(rdp) is False:
     url = 'https://ndownloader.figshare.com/files/8493140'
     print(f"Raw dataset url: {url}")
     myfile = requests.get(url)
-    open('../../data/raw/raw_data.xlsx', 'wb').write(myfile.content)
+    open('../../../data/raw/raw_data.xlsx', 'wb').write(myfile.content)
     print("Raw dataset download complete. \n Check data/raw directory for raw_data.xlsx.")

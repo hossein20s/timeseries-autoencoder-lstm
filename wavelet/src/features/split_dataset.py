@@ -25,7 +25,7 @@ from utils import tvt_split,dict_df_tvt_split,dd_tvt_split
 print("split_dataset - Start...")
 
 # Load clean data from data/interim folder
-dict_dataframes_index = dictmap_load(path = "../data/interim/clean_data_index.xlsx")  
+dict_dataframes_index = dictmap_load(path ="../../../data/interim/clean_data_index.xlsx")
 #print(dict_dataframes_index.keys())
 
 # Split each dataframe into 24 intervals/periods for train/validate/test split
@@ -37,7 +37,7 @@ pickle_save(dict_df_interval,"../data/interim/clean_data_index_interval")
 
 # Split dataset into train-validate-test intervals per split interval
     # Save to disk as `cdii_tvt_split.pickle`
-dict_dataframes_index = pickle_load(path_filename="../data/interim/clean_data_index_interval.pickle")
+dict_dataframes_index = pickle_load(path_filename="../../../data/interim/clean_data_index_interval.pickle")
 tvt_split_df = dd_tvt_split(dict_dataframes_index)
 pickle_save(tvt_split_df,"../data/interim/cdii_tvt_split")
 

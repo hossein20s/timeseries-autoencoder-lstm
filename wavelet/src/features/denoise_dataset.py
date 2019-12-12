@@ -34,7 +34,7 @@ def denoise_periods(dict_dataframes):
 
 
 print("denoise_dataset - Start...")
-ddi_scaled=pickle_load(path_filename="../data/interim/cdii_tvt_split_scaled.pickle")
+ddi_scaled=pickle_load(path_filename="../../../data/interim/cdii_tvt_split_scaled.pickle")
 ddi_denoised= denoise_periods(ddi_scaled)
 pickle_save(ddi_denoised,path_filename="../data/interim/cdii_tvt_split_scaled_denoised")
 print("denoise_dataset - Finished.")

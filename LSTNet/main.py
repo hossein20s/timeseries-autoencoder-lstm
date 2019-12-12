@@ -4,11 +4,9 @@ import time
 
 import torch
 import torch.nn as nn
-import importlib
 
 import Optim
 from utils import DataUtility
-from models import LSTNet
 
 
 def evaluate(data, X, Y, model, evaluateL2, evaluateL1, batch_size):

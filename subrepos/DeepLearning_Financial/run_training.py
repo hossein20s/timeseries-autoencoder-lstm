@@ -1,21 +1,12 @@
 ## EXTERNAL
-import pandas as pd 
-import numpy as np 
-import pickle
-import shutil
+import pandas as pd
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
 import torch.optim as optim
-from torch.utils.data import Dataset, DataLoader
-import torch.nn.functional as F
 import numpy as np
-import sklearn
-import time
 import os
-import random 
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.preprocessing import StandardScaler
+import random
 import matplotlib.pyplot as plt
 
 ##INTERNAL

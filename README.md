@@ -14,10 +14,10 @@ AWS](https://www.slideshare.net/mallyajiggs/time-series-modeling-workd-amld-2018
 
 ## Agenda
 
-0. [Introduction to ApacheMXNet and Gluon - Crash Course](intro_mxnet_gluon)
+0. [Introduction to ApacheMXNet and Gluon - Crash Course](mxnet-gluon/intro_mxnet_gluon)
 1. [Introduction to TimeSeries Analysis](intro_to_timeseries.ipynb)
-2. [Univariate TimeSeries](univariate_timeseries_forecasting_lstm.ipynb)
-3. [Multivariate TimeSeries Forecasting](multivariate_timeseries_forecasting.ipynb)
+2. [Univariate TimeSeries](mxnet-gluon/univariate_timeseries_forecasting_lstm.ipynb)
+3. [Multivariate TimeSeries Forecasting](mxnet-gluon/multivariate_timeseries_forecasting.ipynb)
 4. [TimeSeries Forecasting with DeepAR](sagemaker-timeseries)
 5. [Seq2Seq with Apache MXNet](seq2seq)
 

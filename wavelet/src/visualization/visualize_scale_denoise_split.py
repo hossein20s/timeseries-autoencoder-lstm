@@ -27,9 +27,9 @@ from statsmodels.robust import mad
 from wsae_lstm.utils import pickle_load,pickle_save
 
 
-dict_dataframes_index=pickle_load(path_filename="../data/interim/cdii_tvt_split.pickle")
-ddi_scaled=pickle_load(path_filename="../data/interim/cdii_tvt_split_scaled.pickle")
-ddi_denoised=pickle_load(path_filename="../data/interim/cdii_tvt_split_scaled_denoised.pickle")
+dict_dataframes_index=pickle_load(path_filename="../../../data/interim/cdii_tvt_split.pickle")
+ddi_scaled=pickle_load(path_filename="../../../data/interim/cdii_tvt_split_scaled.pickle")
+ddi_denoised=pickle_load(path_filename="../../../data/interim/cdii_tvt_split_scaled_denoised.pickle")
 
 def tvt_display(dict_dataframes,ddi_scaled,ddi_denoised,fname_extended):
     for key, index_name in enumerate(dict_dataframes):

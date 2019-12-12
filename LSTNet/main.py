@@ -8,6 +8,7 @@ import importlib
 
 import Optim
 from utils import Data_utility
+from models import LSTNet
 
 
 def evaluate(data, X, Y, model, evaluateL2, evaluateL1, batch_size):
@@ -28,8 +29,8 @@ def evaluate(data, X, Y, model, evaluateL2, evaluateL1, batch_size):
             test = torch.cat((test, Y));
         
         scale = data.scale.expand(output.size(0), data.m)
-        total_loss += evaluateL2(output * scale, Y * scale).data[0]
-        total_loss_l1 += evaluateL1(output * scale, Y * scale).data[0]
+        total_loss += evaluateL2(output * scale, Y * scale).item()
+        total_loss_l1 += evaluateL1(output * scale, Y * scale).item()
         n_samples += (output.size(0) * data.m);
     rse = math.sqrt(total_loss / n_samples)/data.rse
     rae = (total_loss_l1/n_samples)/data.rae
@@ -41,7 +42,7 @@ def evaluate(data, X, Y, model, evaluateL2, evaluateL1, batch_size):
     mean_p = predict.mean(axis = 0)
     mean_g = Ytest.mean(axis = 0)
     index = (sigma_g!=0);
-    correlation = ((predict - mean_p) * (Ytest - mean_g)).mean(axis = 0)/(sigma_p * sigma_g);
+    correlation = ((predict - mean_p) * (Ytest - mean_g)).mean(axis = 0)/(sigma_p * sigma_g + 0.000000000000001);
     correlation = (correlation[index]).mean();
     return rse, rae, correlation;
 
@@ -56,7 +57,7 @@ def train(data, X, Y, model, criterion, optim, batch_size):
         loss = criterion(output * scale, Y * scale);
         loss.backward();
         grad_norm = optim.step();
-        total_loss += loss.data[0];
+        total_loss += loss.item();
         n_samples += (output.size(0) * data.m);
     return total_loss / n_samples
     

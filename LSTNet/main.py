@@ -7,7 +7,7 @@ import torch.nn as nn
 import importlib
 
 import Optim
-from utils import Data_utility
+from utils import DataUtility
 from models import LSTNet
 
 
@@ -117,7 +117,7 @@ if __name__ == '__main__':
         else:
             torch.cuda.manual_seed(args.seed)
 
-    Data = Data_utility(args.data, 0.6, 0.2, args.cuda, args.horizon, args.window, args.normalize)
+    Data = DataUtility(args.data, 0.6, 0.2, args.cuda, args.horizon, args.window, args.normalize)
     print(Data.rse)
 
     model = eval(args.model).Model(args, Data)

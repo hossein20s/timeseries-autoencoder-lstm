@@ -1,3 +1,4 @@
+torch
 mxnet
 absl-py==0.7.1
 alabaster==0.7.12

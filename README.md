@@ -67,3 +67,21 @@ Repository package requirements/dependencies are defined in `requirements.txt` f
 ### `mlpanda/DeepLearning_Financial`:
 
 Repository of an existing attempt to replicate above paper in PyTorch ([mlpanda/DeepLearning_Financial](https://github.com/mlpanda/DeepLearning_Financial)), checked out as a `git-subrepo` for reference in the`subrepos`directory. This repository, `subrepos/DeepLearning_Financial`, will be used as a point of reference and comparison for specific components in `wsae-lstm`.
+
+
+# time_series_forecasting
+
+### paper
+
+Modeling Long- and Short-Term Temporal Patterns with Deep Neural Networks.(https://arxiv.org/abs/1703.07015)
+
+### usage
+
+You can download the datasets mentioned in the paper at https://github.com/laiguokun/multivariate-time-series-data.
+
+We give the examples to run different datasets in ele.sh, traffic.sh, solar.sh and stoke.sh.
+
+python main.py --gpu 3 --data data/solar_AL.txt --save save/solar_AL.pt --hidSkip 10 --output_fun Linear
+python main.py --gpu 3 --data data/exchange_rate.txt --save save/exchange_rate.pt --hidCNN 50 --hidRNN 50 --L1Loss False --output_fun None
+python main.py --gpu 3 --data data/traffic.txt --save save/traffic.pt --hidSkip 10
+python main.py --gpu 3 --horizon 24 --data data/electricity.txt --save save/elec.pt --output_fun Linear

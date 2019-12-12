@@ -52,3 +52,7 @@ __pycache__/
 /.idea/
 /venv/
 /multivariate-time-series-data/
+
+data/*
+*.pyc
+save/*

@@ -7,6 +7,8 @@ import torch.nn as nn
 
 import Optim
 from utils import DataUtility
+from models import LSTNet # used in eval
+
 
 
 def evaluate(data, X, Y, model, evaluateL2, evaluateL1, batch_size):

@@ -6,7 +6,6 @@ import time
 
 import torch
 import torch.nn as nn
-from torch.optim import optimizer
 
 import Optim
 from utils import DataUtility
@@ -17,7 +16,7 @@ logger = logging.getLogger(__name__)
 DEFAULT_MODEL_PARAMETER_FILE = 'model/model.pt'
 
 
-def load_checkpoint(model, optimizer, filename=DEFAULT_MODEL_PARAMETER_FILE):
+def load_checkpoint(filename=DEFAULT_MODEL_PARAMETER_FILE):
     # Note: Input model & optimizer should be pre-defined.  This routine only updates their states.
     start_epoch = 0
     losslogger = None
@@ -25,18 +24,16 @@ def load_checkpoint(model, optimizer, filename=DEFAULT_MODEL_PARAMETER_FILE):
         logger.debug("=> loading checkpoint '{}'".format(filename))
         checkpoint = torch.load(filename)
         start_epoch = checkpoint.get('epoch', 0)
-        loaded_model = checkpoint.get('model')
-        model = loaded_model if loaded_model else model
+        model = checkpoint.get('model')
         model.load_state_dict(checkpoint['state_dict'])
-        if optimizer:
-            optimizer.load_state_dict(checkpoint['optimizer'])
+        optim = checkpoint.get('optim')
         losslogger = checkpoint.get('losslogger')
         logger.info("=> loaded checkpoint '{}' (epoch {})"
                      .format(filename, checkpoint['epoch']))
     else:
         logger.debug("=> no checkpoint found at '{}'".format(filename))
 
-    return model, optimizer, start_epoch, losslogger
+    return model, optim, start_epoch, losslogger
 
 # --data data/exchange_rate.txt --save save/exchange_rate.pt --hidCNN 50 --hidRNN 50 --L1Loss False --output_fun None
 
@@ -155,9 +152,12 @@ if __name__ == '__main__':
     filename_to_load_model = args.load
     start_epoch = 0
     if filename_to_load_model and os.path.isfile(filename_to_load_model):
-        model, _, start_epoch, _ = load_checkpoint(model=None, optimizer=None, filename=filename_to_load_model)
+        model, optim, start_epoch, _ = load_checkpoint(filename=filename_to_load_model)
     else:
         model = eval(args.model).Model(args, Data)
+        optim = Optim.Optim(
+            model.parameters(), args.optim, args.lr, args.clip,
+        )
 
     if args.cuda:
         model.cuda()
@@ -177,9 +177,6 @@ if __name__ == '__main__':
         evaluateL2 = evaluateL2.cuda()
 
     best_val = 10000000
-    optim = Optim.Optim(
-        model.parameters(), args.optim, args.lr, args.clip,
-    )
 
     # At any point you can hit Ctrl + C to break out of training early.
     try:
@@ -198,16 +195,17 @@ if __name__ == '__main__':
                 with open(filename_to_save_model, 'wb') as f:
                     checkpoint = {'model': model,
                                   'state_dict': model.state_dict(),
+                                  'optim': optim,
                                   'epoch': epoch + 1}
 
                     torch.save(checkpoint, f)
-                    logger.info("Saving checkpoint")
+                    logger.info("Saving checkpoint with val_loss:{:5.4f} < best_val:{:5.4f}".format(val_loss, best_val))
 
                 best_val = val_loss
             if epoch % 5 == 0:
                 test_acc, test_rae, test_corr = evaluate(Data, Data.test[0], Data.test[1], model, evaluateL2,
                                                          evaluateL1, args.batch_size)
-                logger.debug(
+                logger.info(
                     "test rse {:5.4f} | test rae {:5.4f} | test corr {:5.4f}".format(test_acc, test_rae, test_corr))
 
     except KeyboardInterrupt:
@@ -217,4 +215,4 @@ if __name__ == '__main__':
 
     test_acc, test_rae, test_corr = evaluate(Data, Data.test[0], Data.test[1], model, evaluateL2, evaluateL1,
                                              args.batch_size)
-    logger.debug("test rse {:5.4f} | test rae {:5.4f} | test corr {:5.4f}".format(test_acc, test_rae, test_corr))
+    logger.info("test rse {:5.4f} | test rae {:5.4f} | test corr {:5.4f}".format(test_acc, test_rae, test_corr))

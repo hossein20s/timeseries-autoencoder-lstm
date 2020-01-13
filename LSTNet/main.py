@@ -1,14 +1,41 @@
 import argparse
+import logging
 import math
+import os
 import time
 
 import torch
 import torch.nn as nn
+from torch.optim import optimizer
 
 import Optim
 from utils import DataUtility
-from models import LSTNet # used in eval
+from models import LSTNet  # used in eval
 
+logger = logging.getLogger(__name__)
+DEFAULT_MODEL_PARAMETER_FILE = 'model/model.pt'
+
+
+def load_checkpoint(model, optimizer, filename=DEFAULT_MODEL_PARAMETER_FILE):
+    # Note: Input model & optimizer should be pre-defined.  This routine only updates their states.
+    start_epoch = 0
+    losslogger = None
+    if os.path.isfile(filename):
+        logger.debug("=> loading checkpoint '{}'".format(filename))
+        checkpoint = torch.load(filename)
+        start_epoch = checkpoint.get('epoch', 0)
+        loaded_model = checkpoint.get('model')
+        model = loaded_model if loaded_model else model
+        model.load_state_dict(checkpoint['state_dict'])
+        if optimizer:
+            optimizer.load_state_dict(checkpoint['optimizer'])
+        losslogger = checkpoint['losslogger']
+        logger.debug("=> loaded checkpoint '{}' (epoch {})"
+                     .format(filename, checkpoint['epoch']))
+    else:
+        logger.debug("=> no checkpoint found at '{}'".format(filename))
+
+    return model, optimizer, start_epoch, losslogger
 
 
 def evaluate(data, X, Y, model, evaluateL2, evaluateL1, batch_size):
@@ -93,7 +120,9 @@ if __name__ == '__main__':
     parser.add_argument('--gpu', type=int, default=None)
     parser.add_argument('--log_interval', type=int, default=2000, metavar='N',
                         help='report interval')
-    parser.add_argument('--save', type=str, default='model/model.pt',
+    parser.add_argument('--load', type=str, default=None,
+                        help='path to load the initial model')
+    parser.add_argument('--save', type=str, default=DEFAULT_MODEL_PARAMETER_FILE,
                         help='path to save the final model')
     parser.add_argument('--cuda', type=str, default=True)
     parser.add_argument('--optim', type=str, default='adam')
@@ -113,20 +142,25 @@ if __name__ == '__main__':
     torch.manual_seed(args.seed)
     if torch.cuda.is_available():
         if not args.cuda:
-            print("WARNING: You have a CUDA device, so you should probably run with --cuda")
+            logger.debug("WARNING: You have a CUDA device, so you should probably run with --cuda")
         else:
             torch.cuda.manual_seed(args.seed)
 
     Data = DataUtility(args.data, 0.6, 0.2, args.cuda, args.horizon, args.window, args.normalize)
-    print(Data.rse)
-
-    model = eval(args.model).Model(args, Data)
+    logger.debug(Data.rse)
+    filename_to_save_model = args.save
+    filename_to_load_model = args.load
+    # model, _, start_epoch, _ = load_checkpoint(model, optimizer=None, filename=filename)
+    if filename_to_load_model and os.path.isfile(filename_to_load_model):
+        model = torch.load(filename_to_load_model)
+    else:
+        model = eval(args.model).Model(args, Data)
 
     if args.cuda:
         model.cuda()
 
     nParams = sum([p.nelement() for p in model.parameters()])
-    print('* number of parameters: %d' % nParams)
+    logger.debug('* number of parameters: %d' % nParams)
 
     if args.L1Loss:
         criterion = nn.L1Loss(size_average=False)
@@ -146,33 +180,40 @@ if __name__ == '__main__':
 
     # At any point you can hit Ctrl + C to break out of training early.
     try:
-        print('begin training')
-        for epoch in range(1, args.epochs + 1):
+        logger.debug('begin training')
+        for epoch in range(0, args.epochs + 1):
             epoch_start_time = time.time()
             train_loss = train(Data, Data.train[0], Data.train[1], model, criterion, optim, args.batch_size)
             val_loss, val_rae, val_corr = evaluate(Data, Data.valid[0], Data.valid[1], model, evaluateL2, evaluateL1,
                                                    args.batch_size)
-            print(
+            logger.debug(
                 '| end of epoch {:3d} | time: {:5.2f}s | train_loss {:5.4f} | valid rse {:5.4f} | valid rae {:5.4f} | valid corr  {:5.4f}'.format(
                     epoch, (time.time() - epoch_start_time), train_loss, val_loss, val_rae, val_corr))
             # Save the model if the validation loss is the best we've seen so far.
 
             if val_loss < best_val:
-                with open(args.save, 'wb') as f:
-                    torch.save(model, f)
+                with open(filename_to_save_model, 'wb') as f:
+                    checkpoint = {'model': model,
+                                  'state_dict': model.state_dict(),
+                                  'epoch': epoch + 1}
+
+                    torch.save(checkpoint, f)
+                    logger.info("Saving checkpoint")
+
                 best_val = val_loss
             if epoch % 5 == 0:
                 test_acc, test_rae, test_corr = evaluate(Data, Data.test[0], Data.test[1], model, evaluateL2,
                                                          evaluateL1, args.batch_size)
-                print("test rse {:5.4f} | test rae {:5.4f} | test corr {:5.4f}".format(test_acc, test_rae, test_corr))
+                logger.debug(
+                    "test rse {:5.4f} | test rae {:5.4f} | test corr {:5.4f}".format(test_acc, test_rae, test_corr))
 
     except KeyboardInterrupt:
-        print('-' * 89)
-        print('Exiting from training early')
+        logger.debug('-' * 89)
+        logger.debug('Exiting from training early')
 
     # Load the best saved model.
     with open(args.save, 'rb') as f:
         model = torch.load(f)
     test_acc, test_rae, test_corr = evaluate(Data, Data.test[0], Data.test[1], model, evaluateL2, evaluateL1,
                                              args.batch_size)
-    print("test rse {:5.4f} | test rae {:5.4f} | test corr {:5.4f}".format(test_acc, test_rae, test_corr))
+    logger.debug("test rse {:5.4f} | test rae {:5.4f} | test corr {:5.4f}".format(test_acc, test_rae, test_corr))

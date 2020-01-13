@@ -1,0 +1,13 @@
+2020-01-13 18:07:27.464 (1510) (INFO) main.<module> -> Python version: 3.6.2 (default, Jul 17 2017, 23:14:31) 
+[GCC 5.4.0 20160609]
+2020-01-13 18:07:27.465 (1510) (INFO) main.<module> -> Tensorflow version: 2.0.0
+2020-01-13 18:07:27.465 (1510) (INFO) main.<module> -> Keras version: 2.2.4-tf ... Using tensorflow embedded keras
+2020-01-13 18:07:34.257 (1510) (INFO) lstnet_datautil.split_data -> Splitting data into training set (0.60), validation set (0.20) and testing set (0.20)
+2020-01-13 18:07:41.43 (1510) (INFO) main.<module> -> Training shape: X:(15603, 168, 321) Y:(15603, 321)
+2020-01-13 18:07:41.44 (1510) (INFO) main.<module> -> Validation shape: X:(5261, 168, 321) Y:(5261, 321)
+2020-01-13 18:07:41.44 (1510) (INFO) main.<module> -> Testing shape: X:(5261, 168, 321) Y:(5261, 321)
+2020-01-13 18:07:41.44 (1510) (INFO) main.<module> -> Creating model
+2020-01-13 18:07:41.990 (1510) (INFO) main.<module> -> Model compiled ... No tensorboard visualisation is available
+2020-01-13 18:07:41.990 (1510) (INFO) main.<module> -> Training model ... 
+2020-01-13 20:43:57.894 (1510) (INFO) main.train -> Training time took: 2:36:15.904114
+2020-01-13 20:43:57.894 (1510) (INFO) main.<module> -> Validation on the validation set returned: Loss:0.040307, RSE:0.418137, Correlation:nan

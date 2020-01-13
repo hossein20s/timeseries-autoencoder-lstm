@@ -9,7 +9,7 @@ import torch.nn as nn
 
 import Optim
 from utils import DataUtility
-from models import LSTNet  # used in eval
+from models import LSTNet_pytorch  # used in eval
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)

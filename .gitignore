@@ -53,7 +53,7 @@ __pycache__/
 /venv/
 
 **/data/*
-*.pyc
 **/save/*
 **/load/*
 **/log/*
+*.pyc

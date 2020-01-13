@@ -55,7 +55,5 @@ __pycache__/
 */data/*
 *.pyc
 */save/*
-/LSTNet_pytorch/load/
-/LSTNet/log/
-/LSTNet/save/
-/LSTNet/data/
+*/load/*
+*/log/*

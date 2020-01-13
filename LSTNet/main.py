@@ -12,6 +12,7 @@ import Optim
 from utils import DataUtility
 from models import LSTNet  # used in eval
 
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 DEFAULT_MODEL_PARAMETER_FILE = 'model/model.pt'
 
@@ -29,8 +30,8 @@ def load_checkpoint(model, optimizer, filename=DEFAULT_MODEL_PARAMETER_FILE):
         model.load_state_dict(checkpoint['state_dict'])
         if optimizer:
             optimizer.load_state_dict(checkpoint['optimizer'])
-        losslogger = checkpoint['losslogger']
-        logger.debug("=> loaded checkpoint '{}' (epoch {})"
+        losslogger = checkpoint.get('losslogger')
+        logger.info("=> loaded checkpoint '{}' (epoch {})"
                      .format(filename, checkpoint['epoch']))
     else:
         logger.debug("=> no checkpoint found at '{}'".format(filename))
@@ -134,6 +135,7 @@ if __name__ == '__main__':
     parser.add_argument('--normalize', type=int, default=2)
     parser.add_argument('--output_fun', type=str, default='sigmoid')
     args = parser.parse_args()
+    logger.debug("=> Starting..... '")
 
     args.cuda = args.gpu is not None
     if args.cuda:
@@ -150,9 +152,9 @@ if __name__ == '__main__':
     logger.debug(Data.rse)
     filename_to_save_model = args.save
     filename_to_load_model = args.load
-    # model, _, start_epoch, _ = load_checkpoint(model, optimizer=None, filename=filename)
+    start_epoch = 0
     if filename_to_load_model and os.path.isfile(filename_to_load_model):
-        model = torch.load(filename_to_load_model)
+        model, _, start_epoch, _ = load_checkpoint(model=None, optimizer=None, filename=filename_to_load_model)
     else:
         model = eval(args.model).Model(args, Data)
 
@@ -181,7 +183,7 @@ if __name__ == '__main__':
     # At any point you can hit Ctrl + C to break out of training early.
     try:
         logger.debug('begin training')
-        for epoch in range(0, args.epochs + 1):
+        for epoch in range(start_epoch, args.epochs + 1):
             epoch_start_time = time.time()
             train_loss = train(Data, Data.train[0], Data.train[1], model, criterion, optim, args.batch_size)
             val_loss, val_rae, val_corr = evaluate(Data, Data.valid[0], Data.valid[1], model, evaluateL2, evaluateL1,

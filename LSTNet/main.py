@@ -38,6 +38,7 @@ def load_checkpoint(model, optimizer, filename=DEFAULT_MODEL_PARAMETER_FILE):
 
     return model, optimizer, start_epoch, losslogger
 
+# --data data/exchange_rate.txt --save save/exchange_rate.pt --hidCNN 50 --hidRNN 50 --L1Loss False --output_fun None
 
 def evaluate(data, X, Y, model, evaluateL2, evaluateL1, batch_size):
     model.eval()
@@ -213,9 +214,7 @@ if __name__ == '__main__':
         logger.debug('-' * 89)
         logger.debug('Exiting from training early')
 
-    # Load the best saved model.
-    with open(args.save, 'rb') as f:
-        model = torch.load(f)
+
     test_acc, test_rae, test_corr = evaluate(Data, Data.test[0], Data.test[1], model, evaluateL2, evaluateL1,
                                              args.batch_size)
     logger.debug("test rse {:5.4f} | test rae {:5.4f} | test corr {:5.4f}".format(test_acc, test_rae, test_corr))

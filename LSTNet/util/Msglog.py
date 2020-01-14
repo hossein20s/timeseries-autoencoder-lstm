@@ -24,6 +24,7 @@ def LogInit(name, filename, debuglevel = logging.INFO, log = True):
     # Create a logger with name 'name' and set its level to debuglevel`
     logger = logging.getLogger(name)
     logger.setLevel(debuglevel)
+    logger.propagate = False
 
     # Set the log format
     formatter = logging.Formatter('%(asctime)s.%(msecs)d (%(process)d) (%(levelname)s) %(module)s.%(funcName)s -> %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
@@ -31,7 +32,7 @@ def LogInit(name, filename, debuglevel = logging.INFO, log = True):
     # Configure a StreamHandler that will log messages with level ERROR and CRITICAL onto the console.
     # Those messages will be logged even if log == False
     ch = logging.StreamHandler()
-    ch.setLevel(logging.ERROR)
+    ch.setLevel(logging.DEBUG)
     ch.setFormatter(formatter)
     logger.addHandler(ch)
 

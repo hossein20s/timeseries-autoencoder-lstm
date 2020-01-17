@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 import numpy as np
@@ -8,14 +9,6 @@ from shutil import copyfile
 
 from tensorflow.keras.models import model_from_json
 
-# This test is done so that if logger_name is not set in __main__, the script runs anyway without generating logs
-try:
-    from __main__ import logger_name
-    import logging
-    log = logging.getLogger(logger_name)
-except ImportError:
-    pass
-
 #
 # A generic function to save the model and the weights as follows:
 # - Model saved in the file 'filename.json' as a json file
@@ -24,7 +17,12 @@ except ImportError:
 # The arguments that this function takes are:
 # - model:     The Keras model to save
 # - filename:  Full path of the filename where the model shall be saved without the file extension. Example: dir1/dir2/model
-# 
+#
+from constants import LOGGER_NAME
+
+log = logging.getLogger(LOGGER_NAME)
+
+
 def SaveModel(model, filename):
     if filename is not None:
         try:

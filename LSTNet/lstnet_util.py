@@ -1,5 +1,8 @@
 import argparse
 
+from constants import LOGGER_NAME
+
+
 class LSTNetInit(object):
     #
     # This class contains all initialisation information that are passed as arguments.
@@ -186,9 +189,9 @@ class LSTNetInit(object):
             self.logfilename     =     args.logfilename
 
     def dump(self):
-        from __main__ import logger_name
+
         import logging
-        log = logging.getLogger(logger_name)
+        log = logging.getLogger(LOGGER_NAME)
 
         log.debug("Data: %s", self.data)
         log.debug("Window: %d", self.window)

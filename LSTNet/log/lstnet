@@ -11,3 +11,36 @@
 2020-01-13 18:07:41.990 (1510) (INFO) main.<module> -> Training model ... 
 2020-01-13 20:43:57.894 (1510) (INFO) main.train -> Training time took: 2:36:15.904114
 2020-01-13 20:43:57.894 (1510) (INFO) main.<module> -> Validation on the validation set returned: Loss:0.040307, RSE:0.418137, Correlation:nan
+2020-01-17 17:57:58.227 (3676) (INFO) main.<module> -> Python version: 3.6.2 (default, Jul 17 2017, 23:14:31) 
+[GCC 5.4.0 20160609]
+2020-01-17 17:57:58.228 (3676) (INFO) main.<module> -> Tensorflow version: 2.0.0
+2020-01-17 17:57:58.228 (3676) (INFO) main.<module> -> Keras version: 2.2.4-tf ... Using tensorflow embedded keras
+2020-01-17 17:58:04.886 (3676) (INFO) lstnet_datautil.split_data -> Splitting data into training set (0.60), validation set (0.20) and testing set (0.20)
+2020-01-17 17:58:11.639 (3676) (INFO) main.<module> -> Training shape: X:(15603, 168, 321) Y:(15603, 321)
+2020-01-17 17:58:11.640 (3676) (INFO) main.<module> -> Validation shape: X:(5261, 168, 321) Y:(5261, 321)
+2020-01-17 17:58:11.640 (3676) (INFO) main.<module> -> Testing shape: X:(5261, 168, 321) Y:(5261, 321)
+2020-01-17 17:58:11.640 (3676) (INFO) main.<module> -> Load model from save/electricity/electricity
+2020-01-17 17:58:11.640 (3676) (INFO) model_util.LoadModel -> Loading model and weights ...
+2020-01-17 17:58:12.603 (3676) (INFO) main.<module> -> Model compiled ... No tensorboard visualisation is available
+2020-01-17 21:04:27.603 (7085) (INFO) main.<module> -> Python version: 3.6.2 (default, Jul 17 2017, 23:14:31) 
+[GCC 5.4.0 20160609]
+2020-01-17 21:04:27.603 (7085) (INFO) main.<module> -> Tensorflow version: 2.0.0
+2020-01-17 21:04:27.604 (7085) (INFO) main.<module> -> Keras version: 2.2.4-tf ... Using tensorflow embedded keras
+2020-01-17 21:04:34.276 (7085) (INFO) lstnet_datautil.split_data -> Splitting data into training set (0.60), validation set (0.20) and testing set (0.20)
+2020-01-17 21:04:41.42 (7085) (INFO) main.<module> -> Training shape: X:(15603, 168, 321) Y:(15603, 321)
+2020-01-17 21:04:41.42 (7085) (INFO) main.<module> -> Validation shape: X:(5261, 168, 321) Y:(5261, 321)
+2020-01-17 21:04:41.42 (7085) (INFO) main.<module> -> Testing shape: X:(5261, 168, 321) Y:(5261, 321)
+2020-01-17 21:04:41.42 (7085) (INFO) main.<module> -> Load model from save/electricity/electricity
+2020-01-17 21:04:41.42 (7085) (INFO) model_util.LoadModel -> Loading model and weights ...
+2020-01-17 21:04:41.993 (7085) (INFO) main.<module> -> Model compiled ... No tensorboard visualisation is available
+2020-01-17 21:06:09.703 (7187) (INFO) main.<module> -> Python version: 3.6.2 (default, Jul 17 2017, 23:14:31) 
+[GCC 5.4.0 20160609]
+2020-01-17 21:06:09.703 (7187) (INFO) main.<module> -> Tensorflow version: 2.0.0
+2020-01-17 21:06:09.703 (7187) (INFO) main.<module> -> Keras version: 2.2.4-tf ... Using tensorflow embedded keras
+2020-01-17 21:06:16.960 (7187) (INFO) lstnet_datautil.split_data -> Splitting data into training set (0.60), validation set (0.20) and testing set (0.20)
+2020-01-17 21:06:22.905 (7187) (INFO) main.<module> -> Training shape: X:(31357, 168, 137) Y:(31357, 137)
+2020-01-17 21:06:22.905 (7187) (INFO) main.<module> -> Validation shape: X:(10512, 168, 137) Y:(10512, 137)
+2020-01-17 21:06:22.905 (7187) (INFO) main.<module> -> Testing shape: X:(10512, 168, 137) Y:(10512, 137)
+2020-01-17 21:06:22.906 (7187) (INFO) main.<module> -> Load model from save/solar/solar
+2020-01-17 21:06:22.906 (7187) (INFO) model_util.LoadModel -> Loading model and weights ...
+2020-01-17 21:06:23.866 (7187) (INFO) main.<module> -> Model compiled ... No tensorboard visualisation is available

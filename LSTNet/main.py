@@ -4,9 +4,6 @@
 #    Modeling Long- and Short-Term Temporal Patterns with Deep Neural Networks     #
 ####################################################################################
 # This must be set in the beggining because in model_util, we import it
-logger_name = "lstnet"
-
-
 import sys
 from datetime import datetime
 
@@ -14,14 +11,13 @@ import tensorflow as tf
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.callbacks import ModelCheckpoint
 
+from constants import MONITOR_METRIC, LOGGER_NAME, METRICS
 from lstnet_datautil import DataUtil
 from lstnet_model import PreSkipTrans, PostSkipTrans, PreARTrans, PostARTrans, LSTNetModel, ModelCompile
 from lstnet_plot import AutoCorrelationPlot, PlotHistory, PlotPrediction
 from lstnet_util import GetArguments, LSTNetInit
 from util.Msglog import LogInit
 from util.model_util import LoadModel, SaveModel, SaveResults, SaveHistory
-
-
 
 # Path appended in order to import from util
 sys.path.append('..')
@@ -56,15 +52,15 @@ def train_and_checkpoint(model, data, init, tensorboard=None):
         callbacks.append(lstnet_tensorboard)
 
     checkpoint_callback = ModelCheckpoint(filepath='save/cp.ckpt',
-                                                             save_weights_only=True,
-                                                             save_best_only=True,
-                                                             monitor='val_accuracy',
-                                                             mode='max',
-                                                             verbose=1)
+                                          save_weights_only=True,
+                                          save_best_only=True,
+                                          monitor=MONITOR_METRIC,
+                                          mode='max',
+                                          verbose=1)
 
     callbacks.append(checkpoint_callback)
 
-    early_stopping_callback = EarlyStopping(monitor='val_accuracy', min_delta=0, patience=0, verbose=0, mode='auto',
+    early_stopping_callback = EarlyStopping(monitor=MONITOR_METRIC, min_delta=0, patience=0, verbose=0, mode='auto',
                                             baseline=None, restore_best_weights=False)
     callbacks.append(early_stopping_callback)
 
@@ -100,7 +96,7 @@ if __name__ == '__main__':
     lstnet_init = LSTNetInit(args)
 
     # Initialise logging
-    log = LogInit(logger_name, lstnet_init.logfilename, lstnet_init.debuglevel, lstnet_init.log)
+    log = LogInit(LOGGER_NAME, lstnet_init.logfilename, lstnet_init.debuglevel, lstnet_init.log)
     log.info("Python version: %s", sys.version)
     log.info("Tensorflow version: %s", tf.__version__)
     log.info("Keras version: %s ... Using tensorflow embedded keras", tf.keras.__version__)
@@ -125,7 +121,7 @@ if __name__ == '__main__':
     log.info("Validation shape: X:%s Y:%s", str(Data.valid[0].shape), str(Data.valid[1].shape))
     log.info("Testing shape: X:%s Y:%s", str(Data.test[0].shape), str(Data.test[1].shape))
 
-    if lstnet_init.plot == True and lstnet_init.autocorrelation is not None:
+    if lstnet_init.plot and lstnet_init.autocorrelation is not None:
         AutoCorrelationPlot(Data, lstnet_init)
 
     # If --load is set, load model from file, otherwise create model
@@ -155,14 +151,14 @@ if __name__ == '__main__':
         h = train_and_checkpoint(lstnet, Data, lstnet_init, lstnet_tensorboard)
 
         # Plot training metrics
-        if lstnet_init.plot is True:
-            PlotHistory(h.history, ['loss', 'rse', 'corr'], lstnet_init)
+        if lstnet_init.plot:
+            PlotHistory(h.history, METRICS, lstnet_init)
 
         # Saving model if lstnet_init.save is not None.
         # There's no reason to save a model if lstnet_init.train == False
         SaveModel(lstnet, lstnet_init.save)
         if lstnet_init.saveresults:
-            SaveResults(lstnet, lstnet_init, h.history, test_result, ['loss', 'rse', 'corr'])
+            SaveResults(lstnet, lstnet_init, h.history, test_result, METRICS)
         if lstnet_init.savehistory:
             SaveHistory(lstnet_init.save, h.history)
 

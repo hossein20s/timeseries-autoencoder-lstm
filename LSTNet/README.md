@@ -29,7 +29,15 @@ There are 4 different script samples to train, validate and test the model on th
 ### Predict
 In order to predict and plot traffic you will need to run `main.py` as follows (example for the electricity traffic)
 ```shell
-python3.6 main.py --data="data/electricity.txt" --no-train --load="save/electricity/electricity" --predict=all --plot --series-to-plot=0 
+python3.6 main.py 
+--data="data/electricity.txt" --no-train --load="save/electricity/electricity" --predict=all --plot --series-to-plot=0
+--data="data/solar_AL.txt" --SkipGRUUnits=10 --save="save/solar" --test --savehistory --logfilename="log/lstnet" --debuglevel=10
+--data="data/traffic.txt" --SkipGRUUnits=10 --save="save/traffic" --test --savehistory --logfilename="log/lstnet" --debuglevel=20
+--data="data/exchange_rate.txt" --CNNFilters=50 --GRUUnits=50 --skip=12 --save="save/exchange_rate" --test --savehistory --logfilename="log/lstnet-exchange" --debuglevel=10
+
+--data="data/electricity.txt" --no-train --load="save/electricity/electricity" --predict=all --plot --series-to-plot=1
+--data="data/solar_AL.txt" --no-train --load="save/solar/solar" --predict=all --plot --series-to-plot=1
+--data="data/solar_AL.txt" --SkipGRUUnits=10 --save="save/solar" --test --savehistory --logfilename="log/lstnet-solar.0" --debuglevel=20  --series-to-plot=1 
 ```
 
 ### Running Options

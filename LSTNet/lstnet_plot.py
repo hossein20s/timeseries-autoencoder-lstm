@@ -1,12 +1,13 @@
-import numpy as np
-import matplotlib.pyplot as plt
+# logging
+import logging
 
+import matplotlib.pyplot as plt
+import numpy as np
 from pandas.plotting import autocorrelation_plot
 
-# logging
-from __main__ import logger_name
-import logging
-log = logging.getLogger(logger_name)
+from constants import LOGGER_NAME
+
+log = logging.getLogger(LOGGER_NAME)
 
 
 def AutoCorrelationPlot(Data, init):

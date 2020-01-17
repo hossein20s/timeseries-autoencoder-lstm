@@ -164,17 +164,17 @@ if __name__ == '__main__':
 
     # Validation
     if not lstnet_init.train and lstnet_init.validate:
-        loss, rse, corr = lstnet.evaluate(Data.valid[0], Data.valid[1])
-        log.info("Validation on the validation set returned: Loss:%f, RSE:%f, Correlation:%f", loss, rse, corr)
+        loss, rse, corr, accuracy = lstnet.evaluate(Data.valid[0], Data.valid[1])
+        log.info("Validation on the validation set returned: Loss:%f, RSE:%f, Correlation:%f, Accuracy:%f", loss, rse, corr, accuracy)
     elif lstnet_init.validate:
         log.info("Validation on the validation set returned: Loss:%f, RSE:%f, Correlation:%f",
                  h.history['val_loss'][-1], h.history['val_rse'][-1], h.history['val_corr'][-1])
 
     # Testing evaluation
-    if lstnet_init.evaltest is True:
-        loss, rse, corr = lstnet.evaluate(Data.test[0], Data.test[1])
-        log.info("Validation on the test set returned: Loss:%f, RSE:%f, Correlation:%f", loss, rse, corr)
-        test_result = {'loss': loss, 'rse': rse, 'corr': corr}
+    if lstnet_init.evaltest:
+        loss, rse, corr, accuracy = lstnet.evaluate(Data.test[0], Data.test[1])
+        log.info("Validation on the test set returned: Loss:%f, RSE:%f, Correlation:%f, Accuracy:%f", loss, rse, corr, accuracy)
+        test_result = {'loss': loss, 'rse': rse, 'corr': corr, 'accuracy':accuracy}
 
     # Prediction
     if lstnet_init.predict is not None:

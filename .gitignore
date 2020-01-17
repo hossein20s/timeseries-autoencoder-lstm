@@ -58,3 +58,4 @@ LSTNet/data/
 **/log/*
 *.pyc
 
+/LSTNet/log/

@@ -3,27 +3,28 @@
 #                                                                                  #
 #    Modeling Long- and Short-Term Temporal Patterns with Deep Neural Networks     #
 ####################################################################################
-
 # This must be set in the beggining because in model_util, we import it
-
-
 logger_name = "lstnet"
 
-# Path appended in order to import from util
+
 import sys
-
-sys.path.append('..')
-from util.model_util import LoadModel, SaveModel, SaveResults, SaveHistory
-from util.Msglog import LogInit
-
 from datetime import datetime
 
-from lstnet_util import GetArguments, LSTNetInit
+import tensorflow as tf
+from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.callbacks import ModelCheckpoint
+
 from lstnet_datautil import DataUtil
 from lstnet_model import PreSkipTrans, PostSkipTrans, PreARTrans, PostARTrans, LSTNetModel, ModelCompile
 from lstnet_plot import AutoCorrelationPlot, PlotHistory, PlotPrediction
+from lstnet_util import GetArguments, LSTNetInit
+from util.Msglog import LogInit
+from util.model_util import LoadModel, SaveModel, SaveResults, SaveHistory
 
-import tensorflow as tf
+
+
+# Path appended in order to import from util
+sys.path.append('..')
 
 custom_objects = {
     'PreSkipTrans': PreSkipTrans,
@@ -54,7 +55,7 @@ def train_and_checkpoint(model, data, init, tensorboard=None):
     if tensorboard:
         callbacks.append(lstnet_tensorboard)
 
-    checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath='save/cp.ckpt',
+    checkpoint_callback = ModelCheckpoint(filepath='save/cp.ckpt',
                                                              save_weights_only=True,
                                                              save_best_only=True,
                                                              monitor='val_accuracy',
@@ -62,6 +63,14 @@ def train_and_checkpoint(model, data, init, tensorboard=None):
                                                              verbose=1)
 
     callbacks.append(checkpoint_callback)
+
+    early_stopping_callback = EarlyStopping(monitor='val_accuracy', min_delta=0, patience=0, verbose=0, mode='auto',
+                                            baseline=None, restore_best_weights=False)
+    callbacks.append(early_stopping_callback)
+
+    # cleanup_callback = LambdaCallback(
+    #     on_train_end=lambda logs: [
+    #         p.terminate() for p in processes if p.is_alive()])
 
     start_time = datetime.now()
     history = model.fit(

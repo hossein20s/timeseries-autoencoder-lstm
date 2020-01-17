@@ -146,9 +146,9 @@ def LoadModel(filename, custom_objects):
 #    - Learning rate
 #    - Batch size
 #    - Number of epochs
-# 2- Training results: The last value reached while training for each of the metrics that are
+# 2- Training results: The last value reached while training for each of the s that are
 #    available in history which is a Keras callback dictionary containing all training and
-#    validation (if available) metrics
+#    validation (if available) s
 #    The metrics to be printed are the ones passed in 'metrics' (an array of metrics)
 # 3- Validation results: Same as Training results (if available)
 # 4- Testing results: The same metrics values for testing (if available), passed via the dictionary

@@ -113,7 +113,7 @@ class LSTNetInit(object):
     #                        Default: log/lstnet
     #
     def __init__(self, args, args_is_dictionary = False):
-        if args_is_dictionary is True:
+        if args_is_dictionary:
             self.data            =     args["data"]
             self.window          =     args["window"]
             self.horizon         =     args["horizon"]

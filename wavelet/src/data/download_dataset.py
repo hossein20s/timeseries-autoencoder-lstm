@@ -8,7 +8,7 @@ rdp = "data/raw/raw_data.xlsx"
 print(f"Checking if raw data already downloaded in {rdp_part}...")
 print(f"Raw Data already downloaded: {exists(rdp)}")
 
-if exists(rdp) is True:
+if exists(rdp):
     print(f"Skipping Raw Data download; dataset already downloaded in {rdp_part}.")
 if exists(rdp) is False:
     print("Starting raw dataset download...")

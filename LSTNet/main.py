@@ -56,7 +56,7 @@ def train_and_checkpoint(model, data, init, tensorboard=None):
                                           save_best_only=True,
                                           monitor=MONITOR_METRIC,
                                           mode='max',
-                                          verbose=1)
+                                          verbose=0)
 
     callbacks.append(checkpoint_callback)
 
@@ -144,7 +144,7 @@ if __name__ == '__main__':
         log.info("Model compiled ... No tensorboard visualisation is available")
 
     # Model Training
-    if lstnet_init.train is True:
+    if lstnet_init.train:
 
         # Train the model
         log.info("Training model ... ")
@@ -194,5 +194,5 @@ if __name__ == '__main__':
         else:
             testPredict = None
 
-        if lstnet_init.plot is True:
+        if lstnet_init.plot:
             PlotPrediction(Data, lstnet_init, trainPredict, validPredict, testPredict)

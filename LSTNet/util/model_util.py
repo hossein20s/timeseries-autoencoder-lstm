@@ -198,7 +198,7 @@ def SaveResults(model, init, history, test_result, metrics):
                 key = m
                 f.write("\t" + str(m.title()) + ": " + str(history[key][-1]) + "\n")
 
-            if init.validate is True:
+            if init.validate:
                 try:
                     log.debug("Saving validation results")
                 except NameError:
